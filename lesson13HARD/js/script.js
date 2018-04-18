@@ -146,61 +146,72 @@ window.addEventListener('DOMContentLoaded',function(){
 
 	//SLIDER
 
-	let dotsWrap = document.querySelector('.slider-dots'),
-		dots = document.getElementsByClassName('dot'),
-		prev = document.querySelector('.prev'),
-		next = document.querySelector('.next'),
-		slides = document.getElementsByClassName('slider-item'),
-		slideIndex = 1;
+	var slideNow = 1;
+	var slideCount = $('#slidewrapper').children().length;
+var slideInterval = 3000;
+var navBtnId = 0;
+var translateWidth = 0;
 
-	showSlides(1);
+$(document).ready(function() {
 
-	function showSlides(n){
+    $('#next-btn').click(function() {
+        nextSlide();
+    });
 
-		if (n > slides.length){
-			slideIndex = 1;
-		}
+    $('#prev-btn').click(function() {
+        prevSlide();
+    });
 
-		if (n < 1){
-			slideIndex = slides.length;
-		}
+    $('.slide-nav-btn').click(function() {
+        navBtnId = $(this).index();
 
-		for (let i = 0; i < slides.length; i++){
-			slides[i].style.display = 'none';
-		}
+        if (navBtnId + 1 != slideNow) {
+            translateWidth = -$('#viewport').width() * (navBtnId);
+            $('#slidewrapper').css({
+                'transform': 'translate(' + translateWidth + 'px, 0)',
+                '-webkit-transform': 'translate(' + translateWidth + 'px, 0)',
+                '-ms-transform': 'translate(' + translateWidth + 'px, 0)',
+            });
+            slideNow = navBtnId + 1;
+        }
+    });
+});
 
-		for (let i = 0; i < dots.length; i++){
-			dots[i].classList.remove('dot-active');
-		}
 
-		$(slides[slideIndex-1]).animate({width:'show'},500);
-		dots[slideIndex-1].classList.add('dot-active');
+function nextSlide() {
+    if (slideNow == slideCount || slideNow <= 0 || slideNow > slideCount) {
+        $('#slidewrapper').css('transform', 'translate(0, 0)');
+        slideNow = 1;
+    } else {
+        translateWidth = -$('#viewport').width() * (slideNow);
+        $('#slidewrapper').css({
+            'transform': 'translate(' + translateWidth + 'px, 0)',
+            '-webkit-transform': 'translate(' + translateWidth + 'px, 0)',
+            '-ms-transform': 'translate(' + translateWidth + 'px, 0)',
+        });
+        slideNow++;
+    }
+}
 
-	}
-
-	function plusSlides(n){
-		showSlides(slideIndex += n);
-	}
-
-	function currentSlide(n){
-		showSlides(slideIndex = n);
-	}
-
-	next.addEventListener('click', function(){
-		plusSlides(1);
-	});
-
-	prev.addEventListener('click', function(){
-		plusSlides(-1);
-	});
-
-	dotsWrap.addEventListener('click', function(event){
-		for (let i = 0; i < dots.length+1; i++){
-			if (event.target.classList.contains('dot') && event.target == dots[i-1]){
-				currentSlide(i);
-			}
-		}
-	});
+function prevSlide() {
+    if (slideNow == 1 || slideNow <= 0 || slideNow > slideCount) {
+        translateWidth = -$('#viewport').width() * (slideCount - 1);
+        $('#slidewrapper').css({
+            'transform': 'translate(' + translateWidth + 'px, 0)',
+            '-webkit-transform': 'translate(' + translateWidth + 'px, 0)',
+            '-ms-transform': 'translate(' + translateWidth + 'px, 0)',
+        });
+        slideNow = slideCount;
+    } else {
+        translateWidth = -$('#viewport').width() * (slideNow - 2);
+        $('#slidewrapper').css({
+            'transform': 'translate(' + translateWidth + 'px, 0)',
+            '-webkit-transform': 'translate(' + translateWidth + 'px, 0)',
+            '-ms-transform': 'translate(' + translateWidth + 'px, 0)',
+        });
+        slideNow--;
+    }
+}
 
 	//CALC
 
@@ -220,13 +231,21 @@ window.addEventListener('DOMContentLoaded',function(){
 				money += people.value*1000;
 			}
 		money *= k;
-		total.innerHTML = money;
+		$(total).slideUp('slow');
+		setTimeout(function(){
+			total.innerHTML = money;
+		},600);
+		$(total).slideDown('slow');
 		}
 		else if((people.value < 0 || days.value < 0 || parseInt(people.value) != people.value || parseInt(days.value) != days.value) && people.value != '' && days.value != ''){
 			total.innerHTML = 'Нужны целые положительные числа';
 		}
-		else{
-			total.innerHTML = 0;
+		else if(people.value != '' || days.value != ''){
+			$(total).slideUp('slow');
+			setTimeout(function(){
+				total.innerHTML = 0;
+			},600);
+			$(total).slideDown('slow');
 		}
 	}
 	
